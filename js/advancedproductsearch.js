@@ -132,7 +132,7 @@ jQuery(function ($) {
 		$('#'+productSearchDialogBox).dialog({
 			autoOpen: true,
 			modal: true,
-			width: Math.min($( window ).width() - 50, 1700),
+			width: $('body').innerWidth() - 10,
 			dialogClass: 'discountrule-product-search-box',
 			buttons: [
 				{
@@ -157,9 +157,11 @@ jQuery(function ($) {
 						window.location = window.location.href;
 					}
 				}
+
+				$('body').removeClass('product-search-dialog-box--is-open');
 			},
 			open: function( event, ui ) {
-				//$(this).dialog('option', 'maxHeight', $(window).height()-30);
+				$(this).dialog('option', 'maxHeight', $(window).innerHeight() - 5);
 				AdvancedProductSearch.element = element;
 				AdvancedProductSearch.fk_element = fk_element;
 				AdvancedProductSearch.newToken = token;
@@ -168,6 +170,12 @@ jQuery(function ($) {
 				AdvancedProductSearch.discountLoadSearchProductDialogForm('&element=' + element + '&fk_element=' + fk_element + '&displayResults=' + displayResult + '&sall=' + search_idprod, true);
 				$('#'+productSearchDialogBox).parent().css('z-index', 1002);
 				$('.ui-widget-overlay').css('z-index', 1001);
+
+				$('body').addClass('product-search-dialog-box--is-open');
+
+				$(event.target).dialog('widget')
+					.css({ position: 'fixed' })
+					.position({ my: 'center', at: 'center', of: window });
 			}
 		});
 	});
@@ -272,12 +280,13 @@ AdvancedProductSearch = {};
 				o.focusAtEndSearchInput($("#search-all-form-input"));
 			}
 
-			if($('#'+o.productSearchDialogBox).outerHeight() >= $( window ).height()-150 ){
-				$('#'+o.productSearchDialogBox).dialog( "option", "position", { my: "top", at: "top", of: window } ); // Hack to position the dialog box after ajax load
-			}
-			else{
-				$('#'+o.productSearchDialogBox).dialog( "option", "position", { my: "center", at: "center", of: window } ); // Hack to center vertical the dialog box after ajax load
-			}
+			$('#'+o.productSearchDialogBox).dialog( "option", "position", { my: "top", at: "top", of: window } ); // Hack to position the dialog box after ajax load
+			// if($('#'+o.productSearchDialogBox).outerHeight() >= $( window ).height()-150 ){
+			// 	$('#'+o.productSearchDialogBox).dialog( "option", "position", { my: "top", at: "top", of: window } ); // Hack to position the dialog box after ajax load
+			// }
+			// else{
+			// 	$('#'+o.productSearchDialogBox).dialog( "option", "position", { my: "center", at: "center", of: window } ); // Hack to center vertical the dialog box after ajax load
+			// }
 
 			o.initToolTip($('#'+o.productSearchDialogBox+' .classfortooltip')); // restore tooltip after ajax call
 			$('#'+o.productSearchDialogBox).removeClass('--ajax-loading');
