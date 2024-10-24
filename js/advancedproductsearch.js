@@ -280,7 +280,7 @@ AdvancedProductSearch = {};
 				o.focusAtEndSearchInput($("#search-all-form-input"));
 			}
 
-			$('#'+o.productSearchDialogBox).dialog( "option", "position", { my: "top", at: "top", of: window } ); // Hack to position the dialog box after ajax load
+			$('#'+o.productSearchDialogBox).dialog( "option", "position", { my: "center", at: "center", of: window } ); // Hack to position the dialog box after ajax load
 			// if($('#'+o.productSearchDialogBox).outerHeight() >= $( window ).height()-150 ){
 			// 	$('#'+o.productSearchDialogBox).dialog( "option", "position", { my: "top", at: "top", of: window } ); // Hack to position the dialog box after ajax load
 			// }
