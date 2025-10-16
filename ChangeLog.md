@@ -3,11 +3,22 @@
 
 # NOT RELEASED
 
+## Release 1.11
+- FIX : add multicompany shared element in sql query - *02/09/2025* - 1.11.1
+- NEW : add new hook in advancedProductSearchForm to handle input behavior - *24/07/2025* - 1.11.0
+## Release 1.10
+- FIX : COMPAT V22 - **03/04/2025** - 1.10.2
+- FIX : Ajout d'une condition dans le champ de recherche "fournisseurs" sur la page de recherche avancée. - **09/12/2024** - 1.10.1
 - NEW : Add hooks for list - **12/09/2024** - 1.10.0
+
+## Release 1.9
 - NEW : Display qty of current document  - **12/09/2024** - 1.9.0
+
+## Release 1.8
 - NEW : Setup conf for default search behavior  - **12/09/2024** - 1.8.0
 
 ## Release 1.7
+- FIX : DA026479 - Passage des informations en POST plutôt que GET - **09/07/2025** - 1.7.2
 - FIX : DA025694 - Fatal sur pop-in de recherche quand le prix d'achat = 0. - **06/11/2024** - 1.7.1
 - NEW : Ajout d'une colonne taux de marque dans la pop-in de recherche de produits/services avec tous les calculs dynamiques qui vont avec - **29/10/2024** - 1.7.0
 
@@ -18,6 +29,7 @@
   Changed Dolibarr compatibility range to 16 min - 20 max - **01/08/2024** - 1.6.0
 
 ## Release 1.5
+- FIX : DA026141 - Slash char was not escaped, making preg_replace to return null - **2025-02-24** - 1.5.6
 - FIX : Rend le code propre du FIX 1.5.4 - **19/06/2024** - 1.5.5
 - FIX : DA025087 - L'origine et la nomenclature douanière du produit ne sont pas ajoutés à la description - **17/06/2024** - 1.5.4
 - FIX : DA024805 - Mauvaise définition des droits fournisseurs - **16/04/2024** - 1.5.3
