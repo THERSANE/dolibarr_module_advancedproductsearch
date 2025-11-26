@@ -272,3 +272,9 @@
   body.product-search-dialog-box--is-open{
 	  overflow: hidden;
   }
+
+
+/* css bug fix */
+#product-search-dialog-box .select2-selection.select2-selection--single.search-list-select.selectformat {
+	overflow: hidden;
+}

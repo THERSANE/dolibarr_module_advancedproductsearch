@@ -290,6 +290,84 @@ AdvancedProductSearch = {};
 
 			o.initToolTip($('#'+o.productSearchDialogBox+' .classfortooltip')); // restore tooltip after ajax call
 			$('#'+o.productSearchDialogBox).removeClass('--ajax-loading');
+
+			o.initProductSelect2('#' + o.productSearchDialogBox);
+
+		});
+	}
+
+	/**
+	 * Initialise Select2 sur les selects spécifiés dans le container donné.
+	 * @param {string|jQuery} containerSelector - Le sélecteur du container, ou un objet jQuery.
+	 */
+	o.initProductSelect2 = function (containerSelector) {
+		const $container = (containerSelector instanceof jQuery) ? containerSelector : $(containerSelector);
+		if (!$container.length) return;
+
+		const selectors = [
+			'select[class^="prodfourprice-"]',
+			'select.search-list-select'
+		];
+
+		selectors.forEach(sel => {
+			$container.find(sel).each(function() {
+				const $el = $(this);
+
+				// Ne pas réinitialiser si select2 est déjà appliqué
+				if ($el.hasClass('select2-hidden-accessible')) return;
+
+				$el.select2({
+					dir: 'ltr',
+					width: 'resolve',
+					minimumInputLength: 1,
+					language: (typeof select2arrayoflanguage === 'undefined') ? 'en' : select2arrayoflanguage,
+
+					matcher: function(params, data) {
+						if ($.trim(params.term) === '') return data;
+
+						const term = params.term.toUpperCase();
+						let text = data.text || '';
+						let html = '';
+
+						if (data.element) {
+							const attr = $(data.element).attr('data-html');
+							if (attr !== undefined) html = attr;
+						}
+
+						const content = (text + ' ' + html).toUpperCase();
+						const keywords = term.split(' ');
+
+						for (let i = 0; i < keywords.length; i++) {
+							if (content.indexOf(keywords[i]) === -1) return null;
+						}
+						return data;
+					},
+
+					containerCssClass: ':all:',
+					selectionCssClass: ':all:',
+					dropdownCssClass: 'ui-dialog',
+
+					templateResult: function(data, container) {
+						if (!data.element) return data.text;
+
+						const $containerEl = $(container);
+						$containerEl.addClass($(data.element).attr('class'));
+
+						const html = $(data.element).attr('data-html');
+						if (html !== undefined && typeof htmlEntityDecodeJs === 'function') {
+							return htmlEntityDecodeJs(html);
+						}
+
+						return data.text;
+					},
+
+					templateSelection: function(selection) {
+						return selection.text;
+					},
+
+					escapeMarkup: function(m) { return m; }
+				});
+			});
 		});
 	}
 

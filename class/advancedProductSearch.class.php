@@ -699,6 +699,7 @@ class AdvancedProductSearch
 
 									$this->searchSelectArray = array();
 									$idSelected = '';
+									$minPriceSelected = 0;
 
 									foreach ($TFournPriceList as $TpriceInfos) {
 										$this->searchSelectArray[$TpriceInfos['id']] = array(
@@ -706,17 +707,23 @@ class AdvancedProductSearch
 											'data-up' => $TpriceInfos['price'],
 											'data-fourn_qty' => $TpriceInfos['fourn_qty']
 										);
+
+										if(!empty($TpriceInfos['data-html'])) {
+											$this->searchSelectArray[$TpriceInfos['id']]['label'] = dol_escape_htmltag($TpriceInfos['data-html']); // to avoid matching search bug
+											$this->searchSelectArray[$TpriceInfos['id']]['data-html'] = $TpriceInfos['data-html'];
+										}
+
 										if (isModEnabled('margin')) {
 											if (getDolGlobalInt('MARGIN_TYPE') == 1 && is_numeric($TpriceInfos['id'])) {
-												$idSelected = $TpriceInfos['id'];
+													$idSelected = $TpriceInfos['id'];
 											} elseif (getDolGlobalString('MARGIN_TYPE') === 'pmp') {
-												$idSelected = 'pmpprice';
+													$idSelected = 'pmpprice';
 											} elseif (getDolGlobalString('MARGIN_TYPE') === 'costprice') {
-												$idSelected = 'costprice';
+													$idSelected = 'costprice';
 											}
 										} else {
 											if ($TpriceInfos['id'] == 'pmpprice' && !empty($TpriceInfos['price'])) {
-												$idSelected = 'pmpprice';
+													$idSelected = 'pmpprice';
 											}
 										}
 									}
@@ -746,7 +753,7 @@ class AdvancedProductSearch
 									if ($isSupplier) $this->searchSort = 'ASC';
 									else $this->searchSort = 'DESC';
 									$morecss = 'search-list-select';
-									$addjscombo = 0;
+									$addjscombo = 1;
 									if (!empty($this->searchSelectArray)) {
 										$output .= $form->selectArray('prodfourprice-' . $product->id, $this->searchSelectArray, $idSelected, 0, $key_in_label, $value_as_key, $moreparam, $translate, $maxlen, $disabled, $this->searchSort, $morecss, $addjscombo);
 									}
@@ -1084,6 +1091,7 @@ class AdvancedProductSearch
 			{
 				foreach ($productSupplierArray as $productSupplier)
 				{
+					$dataHtml = '';
 					$price = $productSupplier->fourn_price * (1 - $productSupplier->fourn_remise_percent / 100);
 					$unitprice = $productSupplier->fourn_unitprice * (1 - $productSupplier->fourn_remise_percent / 100);
 
@@ -1092,24 +1100,30 @@ class AdvancedProductSearch
 					if ($productSupplier->fourn_qty == 1)
 					{
 						$title .= price($price, 0, $langs, 0, 0, -1, $conf->currency)."/";
+						$dataHtml.= price($price, 0, $langs, 0, 0, -1, $conf->currency)."/";
 					}
 					$title .= $productSupplier->fourn_qty.' '.($productSupplier->fourn_qty == 1 ? $langs->trans("Unit") : $langs->trans("Units"));
+					$dataHtml.=  $productSupplier->fourn_qty.' '.($productSupplier->fourn_qty == 1 ? $langs->trans("Unit") : $langs->trans("Units"));
 
 					if ($productSupplier->fourn_qty > 1)
 					{
 						$title .= " - ";
 						$title .= price($unitprice, 0, $langs, 0, 0, -1, $conf->currency)."/".$langs->trans("Unit");
+						$dataHtml.=  price($unitprice, 0, $langs, 0, 0, -1, $conf->currency)."/".$langs->trans("Unit");
 						$price = $unitprice;
 					}
 
 					$label = price($price, 0, $langs, 0, 0, -1, $conf->currency)."/".$langs->trans("Unit");
 					if ($productSupplier->fourn_ref) $label .= ' ('.$productSupplier->fourn_ref.')';
 
+					$dataHtml.= '<div><small class="opacitymedium">'.$productSupplier->fourn_name.' - '.$productSupplier->fourn_ref.'</small></div>';
+
 					$prices[] = array(
 						"id" => $productSupplier->product_fourn_price_id,
 						"price" => price2num($price, 0, '', 0),
 						"label" => $label,
 						"title" => $title,
+						'data-html' => $dataHtml,
 						'ref' => $productSupplier->fourn_ref,
 						'fourn_qty' => $productSupplier->fourn_qty
 					); // For price field, we must use price2num(), for label or title, price()
