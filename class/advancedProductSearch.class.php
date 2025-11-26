@@ -699,32 +699,72 @@ class AdvancedProductSearch
 
 									$this->searchSelectArray = array();
 									$idSelected = '';
-									$minPriceSelected = 0;
+
+									// Prépare les variables
+									$foundCostprice = false;
+									$foundPmp = false;
+									$lastNumericId = null;
+									$priceForPmp = null;
+									$priceForCost = null;
+
+									$marginEnabled = isModEnabled('margin');
+									$marginType = $marginEnabled ? getDolGlobalString('MARGIN_TYPE') : null;
 
 									foreach ($TFournPriceList as $TpriceInfos) {
+										$TpriceInfos['price'] == isset($TpriceInfos['price']) ? round(floatval($TpriceInfos['price']),2) : 0;
+
+										// Remplissage de la liste d'options
 										$this->searchSelectArray[$TpriceInfos['id']] = array(
 											'label' => $TpriceInfos['label'],
 											'data-up' => $TpriceInfos['price'],
 											'data-fourn_qty' => $TpriceInfos['fourn_qty']
 										);
 
-										if(!empty($TpriceInfos['data-html'])) {
-											$this->searchSelectArray[$TpriceInfos['id']]['label'] = dol_escape_htmltag($TpriceInfos['data-html']); // to avoid matching search bug
+										if (!empty($TpriceInfos['data-html'])) {
+											$this->searchSelectArray[$TpriceInfos['id']]['label'] = dol_escape_htmltag($TpriceInfos['data-html']);
 											$this->searchSelectArray[$TpriceInfos['id']]['data-html'] = $TpriceInfos['data-html'];
 										}
 
-										if (isModEnabled('margin')) {
-											if (getDolGlobalInt('MARGIN_TYPE') == 1 && is_numeric($TpriceInfos['id'])) {
-													$idSelected = $TpriceInfos['id'];
-											} elseif (getDolGlobalString('MARGIN_TYPE') === 'pmp') {
-													$idSelected = 'pmpprice';
-											} elseif (getDolGlobalString('MARGIN_TYPE') === 'costprice') {
-													$idSelected = 'costprice';
+										// Collecte d'infos pour la décision finale
+										if ($TpriceInfos['id'] === 'costprice') {
+											if (!empty($TpriceInfos['price'])) { // accepte 0 comme valeur possible
+												$foundCostprice = true;
 											}
-										} else {
-											if ($TpriceInfos['id'] == 'pmpprice' && !empty($TpriceInfos['price'])) {
-													$idSelected = 'pmpprice';
+										} elseif ($TpriceInfos['id'] === 'pmpprice') {
+											if (!empty($TpriceInfos['price'])) {
+												$foundPmp = true;
+												$priceForPmp = $TpriceInfos['price'];
 											}
+										} elseif (is_numeric($TpriceInfos['id'])) {
+											// on conserve le dernier id numérique rencontré (comportement précédent)
+											$lastNumericId = $TpriceInfos['id'];
+										}
+									}
+
+									// Décision finale pour idSelected
+									if ($marginEnabled) {
+										if ($marginType === '1') {
+											// Mode 1 : choisir un prix fournisseur (ici le dernier id numérique rencontré)
+											if ($lastNumericId !== null) {
+												$idSelected = $lastNumericId;
+											}
+										} elseif ($marginType === 'pmp') {
+											// Forcer PMP
+											if ($foundPmp) $idSelected = 'pmpprice';
+										} elseif ($marginType === 'costprice') {
+											// Règle étendue : costprice > pmp > meilleur prix fournisseur
+											if ($foundCostprice) {
+												$idSelected = 'costprice';
+											} elseif ($foundPmp) {
+												$idSelected = 'pmpprice';
+											} elseif ($lastNumericId !== null) {
+												$idSelected = $lastNumericId;
+											}
+										}
+									} else {
+										// Module margin désactivé : comportement historique
+										if ($foundPmp && $priceForPmp !== null && $priceForPmp !== '') {
+											$idSelected = 'pmpprice';
 										}
 									}
 
