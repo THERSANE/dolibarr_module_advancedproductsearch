@@ -288,7 +288,14 @@ AdvancedProductSearch = {};
 			// 	$('#'+o.productSearchDialogBox).dialog( "option", "position", { my: "center", at: "center", of: window } ); // Hack to center vertical the dialog box after ajax load
 			// }
 
-			o.initToolTip($('#'+o.productSearchDialogBox+' .classfortooltip')); // restore tooltip after ajax call
+			if(typeof Dolibarr !== undefined){
+				Dolibarr.initNewContent($('#'+o.productSearchDialogBox));
+			}
+			else{
+				o.initToolTip($('#'+o.productSearchDialogBox+' .classfortooltip')); // restore tooltip after ajax call
+			}
+
+
 			$('#'+o.productSearchDialogBox).removeClass('--ajax-loading');
 
 			o.initProductSelect2('#' + o.productSearchDialogBox);

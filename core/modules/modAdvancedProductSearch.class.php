@@ -74,7 +74,7 @@ class modAdvancedProductSearch extends DolibarrModules
 		// Possible values for version are: 'development', 'experimental', 'dolibarr', 'dolibarr_deprecated' or a version string like 'x.y.z'
 		$this->version = '1.8.0';
 		// Url to the file with your last numberversion of this module
-		//$this->url_last_version = 'http://www.example.com/versionmodule.txt';
+		$this->url_last_version = 'http://s.thersane.fr/module-version/'. strtolower($this->name) .'_'.$this->numero.'.txt';
 
 		// Key used in llx_const table to save module status enabled/disabled (where ADVANCEDPRODUCTSEARCH is value of property name of module in uppercase)
 		$this->const_name = 'MAIN_MODULE_'.strtoupper($this->name);
